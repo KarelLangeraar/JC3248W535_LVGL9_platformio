@@ -1,356 +1,124 @@
-# LightSwitch - Fullscreen Rotation UI for JC3248W535
+# Working JC3248W535 LVGL display
 
-A production-ready firmware implementation for the **JC3248W535** ESP32-S3 development board featuring **fullscreen display rotation** with accurate touch input mapping across all 4 angles (0°, 90°, 180°, 270°).
+I got the cheap and widely available JC3248W535 hardware, but had a hard time to get it to behave well with LVGL. Since it took quite some time (and help from copilot) I am sharing my basic working 'proof of concept' code so you can have a jumpstart ..I hope. 
 
-## Features
+My purpose is to build a smart lightswitch for wled, hence the project name.
 
-✨ **Display Rotation**
-- Seamless rotation between 0°, 90°, 180°, and 270° orientations
-- Dynamic resolution switching (320×480 ↔ 480×320)
-- Hardware-accelerated rotation via Canvas + Panel layer
-- Accurate touch input mapping in all orientations
+## ✨ What It Does
 
-🎨 **Modern UI Framework**
-- LVGL 9.2.2 integration with partial buffering
-- Responsive flexbox layout engine
-- Interactive UI components (buttons, labels, grids)
-- Dark theme with smooth color transitions
+- Full display rotation (hardware level, not software)
+- Touch input works correctly at all angles
+- Interactive grid UI demo (6 colored boxes)
+- Bottom info bar with live memory info (Heap + PSRAM)
+- Backlight slider on screen (1% to 100%)
+- Startup splash using GFX
+- Partial LVGL buffer mode (40-line stripe, efficient RAM use)
 
-⚡ **Optimized Performance**
-- Memory efficient: ~111 KB RAM usage
-- Partial buffer rendering (40-line stripe mode)
-- Smooth 60 FPS rendering capability
-- Minimal latency touch response
+## ⚠️ On your own...
+This code comes as it is. It is not optimized since it is a POC and I am certainly no hardware specialist. I am not planning on active monitoring or maintaining the code, but I might...
 
-## Hardware Requirements
+The upside? You are free to use it in any way you like ;)
 
-| Component | Specification |
-|-----------|---|
-| **Microcontroller** | ESP32-S3 (240 MHz dual-core) |
-| **Memory** | 320 KB SRAM, 8 MB PSRAM |
-| **Display** | 320×480 16-bit RGB QSPI TFT (AXS15231B_JC3248) |
-| **Touch Input** | AXS15231B capacitive touch controller (I2C) |
-| **Flash** | 8 MB (via QSPI) |
+## 🧰 Hardware
 
-### Pin Configuration
+- **Board**: JC3248W535 (ESP32-S3)
+- **Display**: 320×480 QSPI TFT (AXS15231B_JC3248)
+- **Touch**: AXS15231B capacitive (I2C)
 
-**QSPI Display Interface (GPIO):**
-- `CS`: GPIO 45
-- `SCK`: GPIO 47
-- `D0-D3`: GPIO 21, 48, 40, 39
+### 🔌 Wiring
 
-**I2C Touch Interface (GPIO):**
-- `SCL`: GPIO 8
-- `SDA`: GPIO 4
-- `INT`: GPIO 3
-- `Addr`: 0x3B
+**Display (QSPI):**
+- CS: GPIO 45
+- SCK: GPIO 47
+- D0: GPIO 21
+- D1: GPIO 48
+- D2: GPIO 40
+- D3: GPIO 39
+- BL: GPIO 1 (backlight)
 
-**Backlight:**
-- `BL`: GPIO 1
+**Touch (I2C):**
+- SCL: GPIO 8
+- SDA: GPIO 4
+- INT: GPIO 3
+- Addr: 0x3B
 
-## Software Stack
+## 🚀 Setup
 
-| Library | Version | Purpose |
-|---------|---------|---------|
-| Arduino Framework | 3.20017 | Core microcontroller libraries |
-| GFX Library for Arduino | 1.4.9 | Display and rotation support |
-| LVGL (Little VGL) | 9.2.2 | UI widgets and layout engine |
-| Wire | 2.0.0 | I2C communication |
+1. **Install PlatformIO**: `pip install platformio`
 
-## Directory Structure
-
-```
-.
-├── platformio.ini          # PlatformIO project configuration
-├── README.md              # This file
-├── .gitignore             # Git ignore rules
-├── include/               # Header files
-│   ├── AppConfig.h        # Hardware pin configuration
-│   ├── AppUI.h            # UI scene builder interface
-│   ├── DisplayManager.h   # Display driver interface
-│   ├── AXS15231B_JC3248.h # Display panel driver
-│   ├── AXS15231B_touch.h  # Touch controller driver
-│   ├── lv_conf.h          # LVGL configuration
-│   └── README             # Include folder notes
-├── src/                   # Source files
-│   ├── main.cpp           # Application entry point
-│   ├── DisplayManager.cpp # Display initialization & rotation logic
-│   ├── AppUI.cpp          # UI scene definition
-│   ├── AXS15231B_JC3248.cpp # Display panel driver impl
-│   └── AXS15231B_touch.cpp  # Touch controller driver impl
-├── lib/                   # Local libraries (if any)
-└── test/                  # Tests (if any)
-```
-
-## Getting Started
-
-### Prerequisites
-
-1. **PlatformIO Core** - Install via `pip install platformio`
-2. **Python 3.8+** - Required by PlatformIO
-3. **USB Serial Port** - To communicate with ESP32-S3
-
-### Installation
-
-1. **Clone the repository:**
+2. **Clone and build:**
    ```bash
-   git clone https://github.com/yourusername/LightSwitch.git
+   git clone <repo>
    cd LightSwitch
+   pio run -j 8
    ```
 
-2. **Install PlatformIO dependencies:**
+3. **Upload:**
    ```bash
-   pio pkg install
+   pio run --target upload --upload-port /dev/ttyACM0
    ```
 
-3. **Connect hardware:**
-   - Plug JC3248W535 into USB port
-   - Verify port detection: `pio device list`
+### ✅ VS Code tasks (recommended)
 
-## Building and Uploading
+Run `Upload + Monitor (Safe)` from **Tasks: Run Task**.
 
-### Build Firmware
+Or use `Upload + Monitor (60s)` if you want it to stop automatically.
+
+It will:
+- upload firmware
+- start serial monitor (`115200`)
+- avoid common port-lock issues from old monitor sessions
+
+## 📦 Versions (tested)
+
+- PlatformIO Core: `6.x`
+- Platform: `espressif32 @ 6.12.0`
+- Framework: `arduinoespressif32 @ 3.20017.241212`
+- Library: `GFX Library for Arduino @ 1.4.9`
+- Library: `lvgl @ 9.2.2`
+- Board config: `esp32-s3-devkitc-1` (`board_build.arduino.memory_type = qio_opi`)
+
+## ⚙️ Config
+
+Pin changes go in `include/AppConfig.h`.
+
+LVGL buffer/color settings in `include/lv_conf.h`.
+
+## 📊 Build Status
+
+- **Flash**: 564 KB
+- **RAM**: 112 KB
+- **Build**: Zero warnings
+
+## 🛠️ If It Doesn't Work
+
+**Black screen**
+- Check backlight (GPIO 1) is HIGH
+- Check QSPI pins are correct
+
+**Touch offset**
+- Verify touch pins (GPIO 3, 4, 8)
+
+**Build fails**
 ```bash
-pio run -j 8              # Fast build (8 parallel jobs)
-pio run -j 1              # Safe build (1 job)
-pio run --target clean    # Clean build artifacts
-```
-
-### Upload to Device
-```bash
-# Build and upload in one command
-pio run -j 1 --target upload --upload-port /dev/ttyACM0
-
-# Monitor serial output (115200 baud)
-pio device monitor --port /dev/ttyACM0 --baud 115200
-```
-
-### Build + Upload + Serial Monitor (Combined)
-```bash
-# Linux/macOS
-pio run -j 1 --target upload --upload-port /dev/ttyACM0 && \
-pio device monitor --port /dev/ttyACM0 --baud 115200
-```
-
-## Configuration
-
-### Hardware Pin Changes
-
-Edit `include/AppConfig.h` to modify GPIO assignments:
-
-```cpp
-// Backlight
-constexpr uint8_t TFT_BL = 1;
-
-// QSPI Display Interface
-constexpr uint8_t TFT_QSPI_CS = 45;
-constexpr uint8_t TFT_QSPI_SCK = 47;
-constexpr uint8_t TFT_QSPI_D0 = 21;
-constexpr uint8_t TFT_QSPI_D1 = 48;
-constexpr uint8_t TFT_QSPI_D2 = 40;
-constexpr uint8_t TFT_QSPI_D3 = 39;
-
-// I2C Touch Interface
-constexpr uint8_t TOUCH_SCL = 8;
-constexpr uint8_t TOUCH_SDA = 4;
-constexpr uint8_t TOUCH_INT = 3;
-constexpr uint8_t TOUCH_ADDR = 0x3B;
-```
-
-### LVGL Configuration
-
-LVGL behavior is controlled via `include/lv_conf.h`. Common settings:
-- Buffer size: 1280 bytes (40-line stripe)
-- Color format: RGB565
-- Partial rendering enabled
-
-## How It Works
-
-### Display Rotation Architecture
-
-The rotation system operates on **two independent layers**:
-
-1. **Hardware Layer** (`DisplayManager::apply_rotation()`)
-   - Calls `gfx->setRotation()` to rotate Canvas/Panel framebuffer
-   - Calls `touch.setRotation()` to rotate touch input coordinates
-   - Updates LVGL resolution via `lv_display_set_resolution()`
-
-2. **LVGL Layer**
-   - Automatically applies pointer transform for rotated display
-   - Layout engine reflows UI elements for new dimensions
-   - No manual rotation API calls needed
-
-### Touch Input Flow
-
-```
-Hardware Touch → AXS15231B_Touch (clamped to 320×480)
-              → LVGL display pointer transform
-              → UI event callbacks
-```
-
-### Rendering Pipeline
-
-```
-LVGL Render → my_disp_flush() → GFX Canvas → QSPI Display
-             (partial buffer)    (framebuffer)
-```
-
-## API Reference
-
-### DisplayManager Namespace
-
-```cpp
-namespace DisplayManager {
-
-// Initialize display, LVGL, and touch input
-// Returns: true on success, false on initialization failure
-bool begin();
-
-// Process LVGL tick and render updates (call in loop)
-void process();
-
-// Cycle to next rotation: 0° → 90° → 180° → 270° → 0°
-void rotateNext();
-
-// Get current rotation in degrees (0, 90, 180, 270)
-int rotationDegrees();
-
-// Get LVGL display handle for advanced operations
-lv_display_t *display();
-
-}
-```
-
-### AppUI Namespace
-
-```cpp
-namespace AppUI {
-
-// Build the UI scene (call once after DisplayManager::begin())
-void build();
-
-// Update rotation display label (called automatically)
-void setRotationLabel(int degrees);
-
-}
-```
-
-## Troubleshooting
-
-### Build Errors
-
-**Error: "Cannot find library"**
-```bash
-# Reinstall dependencies
 rm -rf .pio
 pio pkg install
 ```
 
-**Error: "Flash write timeout"**
-- Reduce upload speed: Edit `platformio.ini` → `upload_speed = 115200`
-- Try different USB port
-- Restart the device
-
-### Display Issues
-
-| Issue | Solution |
-|-------|----------|
-| Black screen | Check backlight GPIO (pin 1) is driven HIGH |
-| Rotation glitch | Ensure `lv_obj_update_layout()` called after rotate |
-| Touch offset | Verify touch driver rotation state matches display |
-| Flickering | Check LVGL buffer size in `lv_conf.h` |
-
-### Serial Debugging
-
-Enable debug output in `src/main.cpp`:
-```cpp
-void setup() {
-    Serial.begin(115200);
-    delay(2000); // Wait for serial monitor
-    Serial.println("System starting...");
-    // ... rest of setup
-}
-```
-
-View output:
+**See serial output:**
 ```bash
 pio device monitor --port /dev/ttyACM0 --baud 115200
 ```
 
-## Performance Metrics
+## 🧱 Code Structure
 
-| Metric | Value |
-|--------|-------|
-| **Flash Used** | ~555 KB / 3.3 MB (16.6%) |
-| **RAM Used** | ~111 KB / 320 KB (34.1%) |
-| **FPS Target** | 60 Hz (5 ms refresh) |
-| **Rotation Time** | <100 ms |
-| **Touch Latency** | <50 ms |
+- `main.cpp` - entry point, minimal setup
+- `DisplayManager.cpp` - display/LVGL/touch driver
+- `SplashScreen.cpp` - boot splash + blink animation
+- `AppUI.cpp` - UI scene
+- `include/AppConfig.h` - GPIO pin config
+interface
 
-## Code Quality
+Enjoy!
 
-✅ **Standards Compliance**
-- MISRA C++ 2008 principles applied
-- All compiler warnings enabled (`-Wall -Wextra`)
-- Memory safety: No dynamic allocation in render loop
-- Error handling for all driver initializations
-
-✅ **Architecture**
-- **SOLID Principles**: Single responsibility per module
-- **Clean Code**: Self-documenting names, focused functions
-- **DRY**: No code duplication across drivers
-- **YAGNI**: Only essential features implemented
-
-✅ **Testing**
-- Functional test: Interactive grid UI with 6 clickable boxes
-- Verified on hardware: All 4 rotation angles
-- Build passes: Zero errors, zero warnings
-
-## License
-
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature`)
-3. Commit with clear messages (`git commit -am 'Add feature X'`)
-4. Push to your branch (`git push origin feature/your-feature`)
-5. Submit a Pull Request
-
-### Code Style Guidelines
-- Use 4-space indentation
-- Keep functions under 100 lines
-- Use descriptive variable names
-- Add comments for complex logic only
-- Ensure builds pass without warnings
-
-## Support & Discussion
-
-- **Issues**: [GitHub Issues](https://github.com/yourusername/LightSwitch/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/LightSwitch/discussions)
-
-## Acknowledgments
-
-- **Arduino GFX Library** by `moononournation` - Display driver foundation
-- **LVGL** by `lvgl` - UI framework
-- **Espressif** - Arduino core for ESP32
-
-## Project Status
-
-| Component | Status |
-|-----------|--------|
-| Display Rotation | ✅ Complete & Tested |
-| Touch Input | ✅ Complete & Tested |
-| UI Framework | ✅ Complete & Tested |
-| Documentation | ✅ Complete |
-| Example UI | ✅ Grid layout demo |
-
----
-
-**Last Updated:** February 2026  
-**ESP32 Variant:** ESP32-S3 (Dual-Core, 240 MHz)  
-**LVGL Version:** 9.2.2  
-**PlatformIO Version:** 6.x+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-karellangeraar-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/karellangeraar)

@@ -1,0 +1,51 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Upload + Monitor (Safe)",
+			"type": "shell",
+			"command": "bash",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"runOptions": {
+				"reevaluateOnRerun": true
+			},
+			"args": [
+				"-lc",
+				"set -e; echo \"[Task] Resolving PlatformIO CLI...\"; PIO=\"$(command -v pio || true)\"; if [ -z \"$PIO\" ] && [ -x \"$HOME/.platformio/penv/bin/pio\" ]; then PIO=\"$HOME/.platformio/penv/bin/pio\"; fi; if [ -z \"$PIO\" ]; then echo \"PlatformIO CLI not found. Install with: pip install platformio\"; exit 127; fi; echo \"[Task] Using: $PIO\"; echo \"[Task] Uploading firmware...\"; \"$PIO\" run --target upload; echo \"[Task] Starting serial monitor (Ctrl+C to stop)...\"; \"$PIO\" device monitor --baud 115200"
+			],
+			"isBackground": false,
+			"presentation": {
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"clear": true
+			},
+			"group": "build"
+		},
+		{
+			"label": "Upload + Monitor (60s)",
+			"type": "shell",
+			"command": "bash",
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"runOptions": {
+				"reevaluateOnRerun": true
+			},
+			"args": [
+				"-lc",
+				"set -e; echo \"[Task] Resolving PlatformIO CLI...\"; PIO=\"$(command -v pio || true)\"; if [ -z \"$PIO\" ] && [ -x \"$HOME/.platformio/penv/bin/pio\" ]; then PIO=\"$HOME/.platformio/penv/bin/pio\"; fi; if [ -z \"$PIO\" ]; then echo \"PlatformIO CLI not found. Install with: pip install platformio\"; exit 127; fi; echo \"[Task] Using: $PIO\"; echo \"[Task] Uploading firmware...\"; \"$PIO\" run --target upload; echo \"[Task] Starting serial monitor for 60s...\"; timeout 60 \"$PIO\" device monitor --baud 115200 || true; echo \"[Task] Monitor stopped after 60s.\""
+			],
+			"isBackground": false,
+			"presentation": {
+				"reveal": "always",
+				"focus": true,
+				"panel": "dedicated",
+				"clear": true
+			},
+			"group": "build"
+		}
+	]
+}

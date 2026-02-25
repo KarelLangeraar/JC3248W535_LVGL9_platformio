@@ -6,6 +6,7 @@
 #include "AXS15231B_touch.h"
 #include "AppConfig.h"
 #include "AppUI.h"
+#include "SplashScreen.h"
 
 namespace {
 
@@ -20,6 +21,13 @@ AXS15231B_Touch touch(TOUCH_SCL, TOUCH_SDA, TOUCH_INT, TOUCH_ADDR, 0);
 lv_display_t *main_display = nullptr;
 uint32_t touch_enable_after_ms = 0;
 uint8_t current_rotation = 0;
+uint8_t current_backlight_percent = 50;
+
+constexpr uint8_t BL_PWM_CHANNEL = 0;
+constexpr uint32_t BL_PWM_FREQ_HZ = 5000;
+constexpr uint8_t BL_PWM_RES_BITS = 8;
+constexpr uint32_t BOOT_BLACKOUT_MS = 500;
+constexpr uint32_t BOOT_SPLASH_MS = 2200;
 
 alignas(4) uint16_t lv_partial_buf[TFT_WIDTH * 40];
 
@@ -107,8 +115,9 @@ namespace DisplayManager {
 
 bool begin()
 {
-    pinMode(TFT_BL, OUTPUT);
-    digitalWrite(TFT_BL, HIGH);
+    ledcSetup(BL_PWM_CHANNEL, BL_PWM_FREQ_HZ, BL_PWM_RES_BITS);
+    ledcAttachPin(TFT_BL, BL_PWM_CHANNEL);
+    ledcWrite(BL_PWM_CHANNEL, 0);
 
     canvas = new Arduino_Canvas(TFT_WIDTH, TFT_HEIGHT, panel);
     gfx = (canvas != nullptr) ? static_cast<Arduino_GFX *>(canvas) : static_cast<Arduino_GFX *>(panel);
@@ -124,7 +133,19 @@ bool begin()
         }
     }
 
+    delay(BOOT_BLACKOUT_MS);
+
     gfx->fillScreen(BLACK);
+    if(canvas != nullptr) {
+        canvas->flush();
+    }
+
+    SplashScreen::drawBootFrame(gfx, canvas, false);
+    setBacklightPercent(40);
+    delay(120);
+
+    SplashScreen::showBoot(gfx, canvas, BOOT_SPLASH_MS);
+    setBacklightPercent(50);
 
     touch.begin();
 
@@ -179,6 +200,30 @@ int rotationDegrees()
 lv_display_t *display()
 {
     return main_display;
+}
+
+void setBacklightPercent(uint8_t percent)
+{
+    if(percent < 1U) {
+        percent = 1U;
+    }
+    if(percent > 100U) {
+        percent = 100U;
+    }
+
+    current_backlight_percent = percent;
+
+    uint32_t duty = (255U * current_backlight_percent) / 100U;
+    if(duty == 0U) {
+        duty = 1U;
+    }
+
+    ledcWrite(BL_PWM_CHANNEL, duty);
+}
+
+uint8_t backlightPercent()
+{
+    return current_backlight_percent;
 }
 
 }
