@@ -19,7 +19,7 @@
 #define TOUCH_SDA 4
 #define TOUCH_INT 3
 #define TOUCH_ADDR 0x3B // Of 0x24 checken
-#define ENABLE_TOUCH 0
+#define ENABLE_TOUCH 1
 #define TFT_WIDTH 320
 #define TFT_HEIGHT 480
 
@@ -111,6 +111,7 @@ void setup() {
     
     gfx->begin();
     gfx->setRotation(0);
+    touch.setRotation(gfx->getRotation());
     Serial.printf("Display geometry: %d x %d, rotation=%u\n", gfx->width(), gfx->height(), gfx->getRotation());
     
     // Explicit Color Cycle Test - 1 Second Each
@@ -127,6 +128,8 @@ void setup() {
 #if ENABLE_TOUCH
     if(!touch.begin()) {
         Serial.println("Touch init failed!");
+    } else {
+        Serial.println("Touch init OK");
     }
     Serial.println("Boot: touch init done");
 #else
