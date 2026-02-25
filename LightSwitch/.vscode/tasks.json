@@ -1,0 +1,83 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Upload Firmware",
+			"type": "shell",
+			"command": "/home/karel/.platformio/penv/bin/pio",
+			"args": [
+				"run",
+				"-j",
+				"1",
+				"--target",
+				"upload",
+				"--upload-port",
+				"/dev/ttyACM0"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Firmware (Fast)",
+			"type": "shell",
+			"command": "/home/karel/.platformio/penv/bin/pio",
+			"args": [
+				"run",
+				"-j",
+				"8"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build Clean (Slow)",
+			"type": "shell",
+			"command": "/home/karel/.platformio/penv/bin/pio run -t clean && /home/karel/.platformio/penv/bin/pio run -j 8",
+			"isBackground": false,
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Build + Upload (Fast)",
+			"type": "shell",
+			"command": "/home/karel/.platformio/penv/bin/pio",
+			"args": [
+				"run",
+				"-j",
+				"1",
+				"--target",
+				"upload",
+				"--upload-port",
+				"/dev/ttyACM0"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$platformio"
+			],
+			"group": "build"
+		},
+		{
+			"label": "Monitor Serial",
+			"type": "shell",
+			"command": "/home/karel/.platformio/penv/bin/pio",
+			"args": [
+				"device",
+				"monitor",
+				"--port",
+				"/dev/ttyACM0",
+				"--baud",
+				"115200"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
