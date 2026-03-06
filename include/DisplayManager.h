@@ -1,7 +1,7 @@
 #ifndef DISPLAY_MANAGER_H
 #define DISPLAY_MANAGER_H
 
-#include <Arduino_GFX_Library.h>
+#include <stdint.h>
 #include <lvgl.h>
 
 namespace DisplayManager {

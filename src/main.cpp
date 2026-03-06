@@ -1,38 +1,55 @@
-#include <Arduino.h>
+#include <stdint.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "esp_log.h"
+#include "esp_heap_caps.h"
+#include "driver/gpio.h"
 
 #include "AppConfig.h"
-#include "AppUI.h"
 #include "DisplayManager.h"
+#include "ui.h"
 
-void setup()
+static const char* TAG = "MAIN";
+
+extern "C" void app_main()
 {
-    pinMode(TFT_BL, OUTPUT);
-    digitalWrite(TFT_BL, LOW);
+    gpio_set_direction((gpio_num_t)TFT_BL, GPIO_MODE_OUTPUT);
+    gpio_set_level((gpio_num_t)TFT_BL, 0);
 
-    Serial.begin(115200);
-    delay(200);
+    vTaskDelay(pdMS_TO_TICKS(200));
 
-    Serial.println("[Mem] Startup memory report");
-    if(psramFound()) {
-        Serial.printf("[Mem] PSRAM total: %u bytes\n", ESP.getPsramSize());
-        Serial.printf("[Mem] PSRAM free : %u bytes\n", ESP.getFreePsram());
+    ESP_LOGI(TAG, "[Mem] Startup memory report");
+    
+    size_t psram_total = heap_caps_get_total_size(MALLOC_CAP_SPIRAM);
+    size_t psram_free = heap_caps_get_free_size(MALLOC_CAP_SPIRAM);
+    
+    if(psram_total > 0) {
+        ESP_LOGI(TAG, "[Mem] PSRAM total: %zu bytes", psram_total);     
+        ESP_LOGI(TAG, "[Mem] PSRAM free : %zu bytes", psram_free);     
     } else {
-        Serial.println("[Mem] PSRAM not detected");
+        ESP_LOGI(TAG, "[Mem] PSRAM not detected");
     }
-    Serial.printf("[Mem] Heap total : %u bytes\n", ESP.getHeapSize());
-    Serial.printf("[Mem] Heap free  : %u bytes\n", ESP.getFreeHeap());
+    
+    ESP_LOGI(TAG, "[Mem] Heap total : %zu bytes", heap_caps_get_total_size(MALLOC_CAP_INTERNAL));
+    ESP_LOGI(TAG, "[Mem] Heap free  : %zu bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
 
     if(!DisplayManager::begin()) {
-        Serial.println("Display init failed");
+        ESP_LOGE(TAG, "Display init failed");
         while(true) {
-            delay(1000);
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }
 
-    AppUI::build();
-}
+    ui_init();
 
-void loop()
-{
-    DisplayManager::process();
+    while(true) {
+        DisplayManager::process();
+        ui_tick();
+        static uint32_t last_print = 0;
+        if(lv_tick_get() - last_print > 5000) {
+            ESP_LOGI(TAG, "Main task stack HWM: %d words", uxTaskGetStackHighWaterMark(NULL));
+            ESP_LOGI(TAG, "Heap free: %zu bytes", heap_caps_get_free_size(MALLOC_CAP_INTERNAL));
+            last_print = lv_tick_get();
+        }
+    }
 }
