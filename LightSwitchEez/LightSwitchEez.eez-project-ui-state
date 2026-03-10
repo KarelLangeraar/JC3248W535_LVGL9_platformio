@@ -1,9 +1,10 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[LightSwitchEez.eez-project]:/userPages/1",
-    "selectedGlobalVariableObject": "[LightSwitchEez.eez-project]:/variables/globalVariables/0",
+    "selectedUserPageObject": "[LightSwitchEez.eez-project]:/userPages/0",
+    "selectedGlobalVariableObject": "[LightSwitchEez.eez-project]:/variables/globalVariables/1",
+    "selectedBitmapObject": "[LightSwitchEez.eez-project]:/bitmaps/0",
     "subnavigationSelectedItems": {
-      "variables-tab/sub-navigation/selected-item": "Actions"
+      "variables-tab/sub-navigation/selected-item": "Global"
     }
   },
   "layoutModel": {
@@ -24,7 +25,7 @@
           },
           {
             "type": "border",
-            "selected": 4,
+            "selected": 2,
             "size": 240,
             "location": "right",
             "children": [
@@ -199,10 +200,21 @@
               "type": "tabset",
               "id": "EDITORS",
               "weight": 60.47841726618705,
-              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
+                {
+                  "type": "tab",
+                  "id": "#68be1aaf-9020-4fe7-ad51-15ffb45ab199",
+                  "name": "Settings",
+                  "component": "editor",
+                  "config": {
+                    "objectPath": "[LightSwitchEez.eez-project]:/settings",
+                    "subObjectPath": "[LightSwitchEez.eez-project]:/settings/general/resourceFiles/0",
+                    "permanent": false
+                  },
+                  "icon": "material:settings"
+                },
                 {
                   "type": "tab",
                   "id": "#f5a66cc1-b93c-4565-98d9-7106a1b321c8",
@@ -225,7 +237,8 @@
                   },
                   "icon": "svg:page"
                 }
-              ]
+              ],
+              "active": true
             },
             {
               "type": "row",
@@ -245,8 +258,7 @@
                       "enableClose": false,
                       "icon": "svg:properties"
                     }
-                  ],
-                  "active": true
+                  ]
                 },
                 {
                   "type": "tabset",
@@ -472,10 +484,10 @@
                 {
                   "type": "tab",
                   "id": "#796610ee-8929-4d5f-a6bc-4cef8353e391",
-                  "name": "Test",
+                  "name": "Main",
                   "component": "editor",
                   "config": {
-                    "objectPath": "[LightSwitchEez.eez-project]:/userPages/1",
+                    "objectPath": "[LightSwitchEez.eez-project]:/userPages/0",
                     "permanent": false
                   },
                   "icon": "svg:page"
@@ -650,7 +662,8 @@
                       "component": "bitmaps",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1057,7 +1070,8 @@
                       "component": "groups",
                       "enableClose": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "type": "tabset",
@@ -1091,11 +1105,13 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "1": {}
+          "2": {
+            "0": {
+              "$selected": true
+            }
+          }
         },
-        "1": {
-          "$selected": true
-        }
+        "1": {}
       },
       "transform": {
         "translate": {
@@ -1117,18 +1133,17 @@
         "0": {
           "0": {},
           "1": {
-            "0": {},
-            "1": {}
+            "1": {},
+            "2": {
+              "0": {}
+            }
           }
-        },
-        "2": {
-          "$selected": true
         }
       },
       "transform": {
         "translate": {
-          "x": -286,
-          "y": -202.83333349227905
+          "x": -321.9399999999992,
+          "y": -173.83333349227905
         },
         "scale": 1
       },
@@ -1152,14 +1167,16 @@
   "showComponentDescriptions": true,
   "logsPanelFilter": "all",
   "selectedStylePropertyName": "",
-  "lvglPart": "MAIN",
+  "lvglPart": "INDICATOR",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "BORDER",
-    "PADDING"
+    "MISCELLANEOUS",
+    "TEXT",
+    "POSITION AND SIZE"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1,
-  "implementationLanguage": "C++"
+  "implementationLanguage": "C++",
+  "openDialogDefaultPath": "C:\\pers\\git\\Arduino_Esp\\LightSwitch\\resources\\Background_main_1_480320.png"
 }

@@ -13,7 +13,7 @@
 objects_t objects;
 
 static const char *screen_names[] = { "Main", "Test" };
-static const char *object_names[] = { "main", "test", "spinner_main", "obj0", "obj1", "button_down", "button_up", "test_slider", "obj2" };
+static const char *object_names[] = { "main", "test", "background", "spinner_main", "obj0", "obj1", "obj2", "button_down", "button_up", "test_slider", "obj3", "obj4", "obj5" };
 
 //
 // Event handlers
@@ -28,7 +28,7 @@ static void event_handler_cb_main_obj0(lv_event_t *e) {
     
     if (event == LV_EVENT_RELEASED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 2, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 3, 0, e);
     }
 }
 
@@ -50,11 +50,11 @@ static void event_handler_cb_test_button_down(lv_event_t *e) {
     
     if (event == LV_EVENT_LONG_PRESSED_REPEAT) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 4, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 5, 0, e);
     }
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 4, 1, e);
+        flowPropagateValueLVGLEvent(flowState, 5, 1, e);
     }
 }
 
@@ -65,11 +65,11 @@ static void event_handler_cb_test_button_up(lv_event_t *e) {
     
     if (event == LV_EVENT_PRESSED) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 6, 0, e);
+        flowPropagateValueLVGLEvent(flowState, 7, 0, e);
     }
     if (event == LV_EVENT_LONG_PRESSED_REPEAT) {
         e->user_data = (void *)0;
-        flowPropagateValueLVGLEvent(flowState, 6, 1, e);
+        flowPropagateValueLVGLEvent(flowState, 7, 1, e);
     }
 }
 
@@ -82,7 +82,21 @@ static void event_handler_cb_test_test_slider(lv_event_t *e) {
         lv_obj_t *ta = lv_event_get_target_obj(e);
         if (tick_value_change_obj != ta) {
             int32_t value = lv_slider_get_value(ta);
-            assignIntegerProperty(flowState, 8, 3, value, "Failed to assign Value in Slider widget");
+            assignIntegerProperty(flowState, 9, 3, value, "Failed to assign Value in Slider widget");
+        }
+    }
+}
+
+static void event_handler_cb_test_obj3(lv_event_t *e) {
+    lv_event_code_t event = lv_event_get_code(e);
+    void *flowState = lv_event_get_user_data(e);
+    (void)flowState;
+    
+    if (event == LV_EVENT_VALUE_CHANGED) {
+        lv_obj_t *ta = lv_event_get_target_obj(e);
+        if (tick_value_change_obj != ta) {
+            int32_t value = lv_dropdown_get_selected(ta);
+            assignIntegerProperty(flowState, 10, 3, value, "Failed to assign Selected in Dropdown widget");
         }
     }
 }
@@ -101,11 +115,19 @@ void create_screen_main() {
     {
         lv_obj_t *parent_obj = obj;
         {
+            // background
+            lv_obj_t *obj = lv_image_create(parent_obj);
+            objects.background = obj;
+            lv_obj_set_pos(obj, 0, 0);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_image_set_src(obj, &img_back_main);
+        }
+        {
             // spinnerMain
             lv_obj_t *obj = lv_spinner_create(parent_obj);
             objects.spinner_main = obj;
-            lv_obj_set_pos(obj, 166, 51);
-            lv_obj_set_size(obj, 149, 134);
+            lv_obj_set_pos(obj, 199, 93);
+            lv_obj_set_size(obj, 82, 84);
             lv_obj_set_style_arc_color(obj, lv_color_hex(0xff2196f3), LV_PART_INDICATOR | LV_STATE_DEFAULT);
             lv_obj_set_style_arc_opa(obj, -128, LV_PART_INDICATOR | LV_STATE_DEFAULT);
         }
@@ -148,8 +170,8 @@ void create_screen_test() {
         {
             lv_obj_t *obj = lv_button_create(parent_obj);
             objects.obj1 = obj;
-            lv_obj_set_pos(obj, 190, 239);
-            lv_obj_set_size(obj, 100, 50);
+            lv_obj_set_pos(obj, 190, 271);
+            lv_obj_set_size(obj, 100, 36);
             lv_obj_add_event_cb(obj, event_handler_cb_test_obj1, LV_EVENT_ALL, flowState);
             {
                 lv_obj_t *parent_obj = obj;
@@ -158,21 +180,37 @@ void create_screen_test() {
                     lv_obj_set_pos(obj, 0, 0);
                     lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
                     lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-                    lv_label_set_text(obj, "Main");
+                    lv_label_set_text(obj, "Back");
                 }
             }
         }
         {
             lv_obj_t *obj = lv_obj_create(parent_obj);
-            lv_obj_set_pos(obj, 15, 10);
-            lv_obj_set_size(obj, 450, 200);
+            lv_obj_set_pos(obj, 29, 15);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             {
                 lv_obj_t *parent_obj = obj;
+                {
+                    lv_obj_t *obj = lv_label_create(parent_obj);
+                    objects.obj2 = obj;
+                    lv_obj_set_pos(obj, 5, -19);
+                    lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+                    lv_obj_set_style_text_font(obj, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_text_color(obj, lv_color_hex(0xff1bc4ad), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_color(obj, lv_color_hex(0xff24a2ae), LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_border_width(obj, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_right(obj, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_left(obj, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_bottom(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_obj_set_style_pad_top(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    lv_label_set_text(obj, "");
+                }
                 {
                     // buttonDown
                     lv_obj_t *obj = lv_button_create(parent_obj);
                     objects.button_down = obj;
-                    lv_obj_set_pos(obj, 12, 58);
+                    lv_obj_set_pos(obj, LV_PCT(0), 58);
                     lv_obj_set_size(obj, 50, 50);
                     lv_obj_add_event_cb(obj, event_handler_cb_test_button_down, LV_EVENT_ALL, flowState);
                     {
@@ -191,7 +229,7 @@ void create_screen_test() {
                     // buttonUp
                     lv_obj_t *obj = lv_button_create(parent_obj);
                     objects.button_up = obj;
-                    lv_obj_set_pos(obj, 363, 59);
+                    lv_obj_set_pos(obj, LV_PCT(88), 59);
                     lv_obj_set_size(obj, 47, 50);
                     lv_obj_add_event_cb(obj, event_handler_cb_test_button_up, LV_EVENT_ALL, flowState);
                     {
@@ -212,25 +250,36 @@ void create_screen_test() {
             // Test_slider
             lv_obj_t *obj = lv_slider_create(parent_obj);
             objects.test_slider = obj;
-            lv_obj_set_pos(obj, 148, 99);
-            lv_obj_set_size(obj, 182, 24);
+            lv_obj_set_pos(obj, LV_PCT(30), 99);
+            lv_obj_set_size(obj, 200, 24);
             lv_obj_add_event_cb(obj, event_handler_cb_test_test_slider, LV_EVENT_ALL, flowState);
+            lv_obj_add_flag(obj, LV_OBJ_FLAG_ADV_HITTEST);
+        }
+        {
+            lv_obj_t *obj = lv_dropdown_create(parent_obj);
+            objects.obj3 = obj;
+            lv_obj_set_pos(obj, 166, 210);
+            lv_obj_set_size(obj, 150, LV_SIZE_CONTENT);
+            lv_dropdown_set_options(obj, "0\n90\n180\n270");
+            lv_dropdown_set_dir(obj, LV_DIR_TOP);
+            lv_dropdown_set_symbol(obj, LV_SYMBOL_UP);
+            lv_obj_add_event_cb(obj, event_handler_cb_test_obj3, LV_EVENT_ALL, flowState);
         }
         {
             lv_obj_t *obj = lv_label_create(parent_obj);
-            objects.obj2 = obj;
-            lv_obj_set_pos(obj, -1, -111);
+            objects.obj4 = obj;
+            lv_obj_set_pos(obj, 205, 22);
             lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-            lv_obj_set_style_text_font(obj, &lv_font_montserrat_30, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_color(obj, lv_color_hex(0xff1bc4ad), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_align(obj, LV_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_border_color(obj, lv_color_hex(0xff24a2ae), LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_border_width(obj, 1, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_right(obj, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_left(obj, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_bottom(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_pad_top(obj, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_label_set_text(obj, "");
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xffd0c898), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "Backlight");
+        }
+        {
+            lv_obj_t *obj = lv_label_create(parent_obj);
+            objects.obj5 = obj;
+            lv_obj_set_pos(obj, 209, 186);
+            lv_obj_set_size(obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+            lv_obj_set_style_text_color(obj, lv_color_hex(0xffd0c898), LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_label_set_text(obj, "Rotation");
         }
     }
     
@@ -241,7 +290,16 @@ void tick_screen_test() {
     void *flowState = getFlowState(0, 1);
     (void)flowState;
     {
-        int32_t new_val = evalIntegerProperty(flowState, 8, 3, "Failed to evaluate Value in Slider widget");
+        const char *new_val = evalTextProperty(flowState, 4, 3, "Failed to evaluate Text in Label widget");
+        const char *cur_val = lv_label_get_text(objects.obj2);
+        if (strcmp(new_val, cur_val) != 0) {
+            tick_value_change_obj = objects.obj2;
+            lv_label_set_text(objects.obj2, new_val);
+            tick_value_change_obj = NULL;
+        }
+    }
+    {
+        int32_t new_val = evalIntegerProperty(flowState, 9, 3, "Failed to evaluate Value in Slider widget");
         int32_t cur_val = lv_slider_get_value(objects.test_slider);
         if (new_val != cur_val) {
             tick_value_change_obj = objects.test_slider;
@@ -250,12 +308,14 @@ void tick_screen_test() {
         }
     }
     {
-        const char *new_val = evalTextProperty(flowState, 9, 3, "Failed to evaluate Text in Label widget");
-        const char *cur_val = lv_label_get_text(objects.obj2);
-        if (strcmp(new_val, cur_val) != 0) {
-            tick_value_change_obj = objects.obj2;
-            lv_label_set_text(objects.obj2, new_val);
-            tick_value_change_obj = NULL;
+        if (!(lv_obj_get_state(objects.obj3) & LV_STATE_EDITED)) {
+            int32_t new_val = evalIntegerProperty(flowState, 10, 3, "Failed to evaluate Selected in Dropdown widget");
+            int32_t cur_val = lv_dropdown_get_selected(objects.obj3);
+            if (new_val != cur_val) {
+                tick_value_change_obj = objects.obj3;
+                lv_dropdown_set_selected(objects.obj3, new_val);
+                tick_value_change_obj = NULL;
+            }
         }
     }
 }

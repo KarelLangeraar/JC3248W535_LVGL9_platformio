@@ -44,6 +44,8 @@ void apply_rotation(uint8_t rotation)
     else if (rotation == 2) lv_rot = LV_DISPLAY_ROTATION_180;
     else if (rotation == 3) lv_rot = LV_DISPLAY_ROTATION_270;
 
+    // LVGL 9 automatically translates touch coordinates to match display rotation.
+    // We strictly feed physical coordinates into LVGL.
     lv_display_set_rotation(main_display, lv_rot);
 
     lv_obj_t *active = lv_screen_active();
@@ -104,8 +106,18 @@ void my_disp_flush(lv_display_t *disp, const lv_area_t *area, uint8_t *px_map)
                 dest_row[py_x] = __builtin_bswap16(src[vy * vw + vx]);
             }
         }
+    } else if (rot == LV_DISPLAY_ROTATION_180) {
+        for (int32_t vy = 0; vy < vh; vy++) {
+            int32_t py_y = 479 - (vy1 + vy);
+            if(py_y < 0 || py_y >= 480) continue;
+            for (int32_t vx = 0; vx < vw; vx++) {
+                int32_t py_x = 319 - (vx1 + vx);
+                if(py_x < 0 || py_x >= 320) continue;
+                full_fb[py_y * 320 + py_x] = __builtin_bswap16(src[vy * vw + vx]);
+            }
+        }
     } else {
-        // ROTATION_0 or 180
+        // ROTATION_0
         for (int32_t vy = 0; vy < vh; vy++) {
             int32_t py_y = vy1 + vy;
             if(py_y < 0 || py_y >= 480) continue;
@@ -187,7 +199,7 @@ bool begin()
     ledc_channel.hpoint         = 0;
     ledc_channel_config(&ledc_channel);
 
-    if(!gfx->init(TFT_QSPI_CS, TFT_QSPI_SCK, TFT_QSPI_D0, TFT_QSPI_D1, TFT_QSPI_D2, TFT_QSPI_D3, -1, 32000000)) {
+    if(!gfx->init(TFT_QSPI_CS, TFT_QSPI_SCK, TFT_QSPI_D0, TFT_QSPI_D1, TFT_QSPI_D2, TFT_QSPI_D3, -1, 40000000)) {
         return false;
     }
 
@@ -239,7 +251,7 @@ bool begin()
         buf1 = heap_caps_malloc(actual_buffer_size, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
         buf2 = heap_caps_malloc(actual_buffer_size, MALLOC_CAP_DMA | MALLOC_CAP_INTERNAL);
     }
-
+    
     lv_display_set_buffers(main_display, buf1, buf2, actual_buffer_size, LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     lv_indev_t *indev = lv_indev_create();
@@ -280,6 +292,25 @@ void rotateNext()
     apply_rotation(next_rotation(current_rotation));
 }
 
+void setRotationDegrees(int degrees)
+{
+    // Sanitize input degrees to 0, 1, 2, or 3 mappings
+    degrees = degrees % 360;
+    if (degrees < 0) degrees += 360;
+    
+    uint8_t rotation = 0;
+    if (degrees == 90) rotation = 1;
+    else if (degrees == 180) rotation = 2;
+    else if (degrees == 270) rotation = 3;
+    
+    // Ignore if already set to avoid continuous redraws when triggered by UI refresh loops
+    if (current_rotation == rotation && main_display != nullptr) {
+        return;
+    }
+
+    apply_rotation(rotation);
+}
+
 int rotationDegrees()
 {
     return (int)current_rotation * 90;
@@ -298,6 +329,8 @@ void setBacklightPercent(uint8_t percent)
     if(percent > 100U) {
         percent = 100U;
     }
+
+    if (current_backlight_percent == percent) return;
 
     current_backlight_percent = percent;
 
