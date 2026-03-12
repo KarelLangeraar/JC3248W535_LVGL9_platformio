@@ -6,6 +6,9 @@ This code is meant as a starting point for development so you don't have to figu
 
 My primary purpose is to build a smart lightswitch for WLED, hence the project name.
 
+> [!NOTE]
+> The previous arduino gfx example was slow and cpu intensive. For administrative and informative purpose it can be found [here](https://github.com/KarelLangeraar/JC3248W535_LVGL9_platformio/tree/Arduino_implementation_slow)
+
 ## ✨ What It Does
 
 Shows some pretty twinkling and shooting stars on the main screen for testing purpose. 
