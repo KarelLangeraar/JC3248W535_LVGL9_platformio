@@ -1,18 +1,21 @@
 # Working JC3248W535 LVGL display (ESP-IDF Native)
 
-I got the cheap and widely available **JC3248W535** hardware, but had a hard time getting it to behave well with LVGL using the typical Arduino framework. After battling intense memory constraints and `LoadProhibited` DMA crashes, this project has been fully ported to **Native ESP-IDF**.
+I got the cheap and widely available **JC3248W535** hardware, but had a hard time getting it to behave well with LVGL using the typical Arduino framework. After battling memory constraints and `LoadProhibited` DMA crashes, this project has been fully ported to **Native ESP-IDF**.
 
 This code is meant as a starting point for development so you don't have to figure it out from scratch. 
 
-My primary purpose is to build a smart lightswitch for WLED, hence the project name.
+My goals is to build a smart lightswitch for WLED, hence the project name.
 
 > [!NOTE]
 > The previous arduino gfx example was slow and cpu intensive. For administrative and informative purpose it can be found [here](https://github.com/KarelLangeraar/JC3248W535_LVGL9_platformio/tree/Arduino_implementation_slow)
 
 ## ✨ What It Does
 
+<img width="240" height="160" alt="Main page" src="https://github.com/user-attachments/assets/36dbdbb8-9536-4d91-8ef6-a7e5167e12ad" />
+<img width="240" height="160" alt="Testscreen" src="https://github.com/user-attachments/assets/6d86bb82-db55-41e4-a4a9-0afbbf9aa846" />
+
 Shows some pretty twinkling and shooting stars on the main screen for testing purpose. 
-On the test screen you can change rotation, backlighting and toggle stats (fps & cpu)
+On the test screen you can change rotation & backlight and toggle stats (fps & cpu)
 
 - **Native ESP-IDF Architecture:** Bypasses Arduino framework limitations, offering direct control over precise memory alignment to prevent rendering crashes.
 - **Optimized Rendering Engine:** Custom layout pushes contiguous partial pixel buffers using an intermediate PSRAM full-framebuffer to prevent QSPI screen scrambling, keeping drawing tear-free and stable at maximum 40MHz SPI.
