@@ -22,6 +22,8 @@ extern int32_t get_var_test_value();
 extern void set_var_test_value(int32_t value);
 extern int32_t get_var_screen_rotation();
 extern void set_var_screen_rotation(int32_t value);
+extern bool get_var_show_stats();
+extern void set_var_show_stats(bool value);
 
 #ifdef __cplusplus
 }

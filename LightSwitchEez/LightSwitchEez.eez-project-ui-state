@@ -1,8 +1,8 @@
 {
   "navigation": {
-    "selectedUserPageObject": "[LightSwitchEez.eez-project]:/userPages/0",
-    "selectedGlobalVariableObject": "[LightSwitchEez.eez-project]:/variables/globalVariables/1",
-    "selectedBitmapObject": "[LightSwitchEez.eez-project]:/bitmaps/0",
+    "selectedUserPageObject": "[LightSwitchEez.eez-project]:/userPages/1",
+    "selectedGlobalVariableObject": "[LightSwitchEez.eez-project]:/variables/globalVariables/2",
+    "selectedBitmapObject": "[LightSwitchEez.eez-project]:/bitmaps/20",
     "subnavigationSelectedItems": {
       "variables-tab/sub-navigation/selected-item": "Global"
     }
@@ -26,7 +26,7 @@
           {
             "type": "border",
             "selected": 2,
-            "size": 240,
+            "size": 197.828125,
             "location": "right",
             "children": [
               {
@@ -82,6 +82,7 @@
           {
             "type": "border",
             "selected": 0,
+            "size": 99.15625,
             "location": "bottom",
             "children": [
               {
@@ -128,7 +129,7 @@
             {
               "type": "row",
               "id": "#3cb82850-83e4-4a5f-b50a-71a7e91787b4",
-              "weight": 15,
+              "weight": 19.41246337793966,
               "children": [
                 {
                   "type": "tabset",
@@ -199,22 +200,11 @@
             {
               "type": "tabset",
               "id": "EDITORS",
-              "weight": 60.47841726618705,
+              "weight": 46.194473038245306,
+              "selected": 1,
               "enableDeleteWhenEmpty": false,
               "enableClose": false,
               "children": [
-                {
-                  "type": "tab",
-                  "id": "#68be1aaf-9020-4fe7-ad51-15ffb45ab199",
-                  "name": "Settings",
-                  "component": "editor",
-                  "config": {
-                    "objectPath": "[LightSwitchEez.eez-project]:/settings",
-                    "subObjectPath": "[LightSwitchEez.eez-project]:/settings/general/resourceFiles/0",
-                    "permanent": false
-                  },
-                  "icon": "material:settings"
-                },
                 {
                   "type": "tab",
                   "id": "#f5a66cc1-b93c-4565-98d9-7106a1b321c8",
@@ -243,7 +233,7 @@
             {
               "type": "row",
               "id": "#b8289efc-3691-42f3-a465-c653b8527251",
-              "weight": 24.52158273381295,
+              "weight": 34.39306358381503,
               "children": [
                 {
                   "type": "tabset",
@@ -1105,18 +1095,14 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "2": {
-            "0": {
-              "$selected": true
-            }
-          }
+          "2": {}
         },
         "1": {}
       },
       "transform": {
         "translate": {
-          "x": -259.15,
-          "y": -199.58385391235353
+          "x": -251.5,
+          "y": -210
         },
         "scale": 1
       },
@@ -1131,11 +1117,15 @@
       "selectionFront": {},
       "selectionBack": {
         "0": {
-          "0": {},
-          "1": {
-            "1": {},
-            "2": {
-              "0": {}
+          "0": {
+            "0": {
+              "2": {}
+            },
+            "1": {
+              "1": {
+                "0": {},
+                "1": {}
+              }
             }
           }
         }
@@ -1167,16 +1157,15 @@
   "showComponentDescriptions": true,
   "logsPanelFilter": "all",
   "selectedStylePropertyName": "",
-  "lvglPart": "INDICATOR",
+  "lvglPart": "MAIN",
   "lvglState": "DEFAULT",
   "lvglExpandedPropertiesGroup": [
-    "MISCELLANEOUS",
-    "TEXT",
-    "POSITION AND SIZE"
+    "MARGIN",
+    "PADDING"
   ],
   "showInactiveFlowsInDebugger": true,
   "globalFlowZoom": true,
   "flowZoom": 1,
   "implementationLanguage": "C++",
-  "openDialogDefaultPath": "C:\\pers\\git\\Arduino_Esp\\LightSwitch\\resources\\Background_main_1_480320.png"
+  "openDialogDefaultPath": "C:\\pers\\git\\Arduino_Esp\\LightSwitch\\resources\\shooting_star\\shooting_star_streak_frame10.png"
 }

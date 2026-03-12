@@ -38,3 +38,13 @@ void set_var_screen_rotation(int32_t value) {
 
     DisplayManager::setRotationDegrees(degrees);
 }
+
+static bool show_stats_val = false;
+
+bool get_var_show_stats() {
+    return show_stats_val;
+}
+
+void set_var_show_stats(bool value) {
+    show_stats_val = value;
+}

@@ -32,6 +32,7 @@ typedef struct _objects_t {
     lv_obj_t *button_down;
     lv_obj_t *test_slider;
     lv_obj_t *button_up;
+    lv_obj_t *show_stats_check;
     lv_obj_t *obj6;
     lv_obj_t *obj7;
     lv_obj_t *obj8;
