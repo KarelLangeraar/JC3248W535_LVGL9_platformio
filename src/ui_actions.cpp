@@ -14,7 +14,7 @@ int32_t get_var_test_value() {
 }
 
 void set_var_test_value(int32_t value) {
-    if (test_value == value) return; // Prevent variable loopbacks causing infinite rendering redraws
+    if (test_value == value) return;
     test_value = value;
     DisplayManager::setBacklightPercent((uint8_t)value);
 }
@@ -26,7 +26,7 @@ int32_t get_var_screen_rotation() {
 }
 
 void set_var_screen_rotation(int32_t value) {
-    if (screen_rotation_val == value) return; // Prevent loopbacks!
+    if (screen_rotation_val == value) return;
     screen_rotation_val = value;
 
     int32_t degrees = value;

@@ -1,5 +1,25 @@
 #include "images.h"
 
-const ext_img_desc_t images[1] = {
+const ext_img_desc_t images[21] = {
     { "back_main", &img_back_main },
+    { "star1", &img_star1 },
+    { "star2", &img_star2 },
+    { "star3", &img_star3 },
+    { "star4", &img_star4 },
+    { "star5", &img_star5 },
+    { "star6", &img_star6 },
+    { "star7", &img_star7 },
+    { "star8", &img_star8 },
+    { "star9", &img_star9 },
+    { "star10", &img_star10 },
+    { "shooting_star_1", &img_shooting_star_1 },
+    { "shooting_star_2", &img_shooting_star_2 },
+    { "shooting_star_3", &img_shooting_star_3 },
+    { "shooting_star_4", &img_shooting_star_4 },
+    { "shooting_star_5", &img_shooting_star_5 },
+    { "shooting_star_6", &img_shooting_star_6 },
+    { "shooting_star_7", &img_shooting_star_7 },
+    { "shooting_star_8", &img_shooting_star_8 },
+    { "shooting_star_9", &img_shooting_star_9 },
+    { "shooting_star_10", &img_shooting_star_10 },
 };

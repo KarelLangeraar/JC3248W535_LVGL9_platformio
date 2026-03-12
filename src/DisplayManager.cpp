@@ -48,10 +48,15 @@ void apply_rotation(uint8_t rotation)
     // We strictly feed physical coordinates into LVGL.
     lv_display_set_rotation(main_display, lv_rot);
 
-    lv_obj_t *active = lv_screen_active();
-    if(active != nullptr) {
-        lv_obj_update_layout(active);
-        lv_obj_invalidate(active);
+    // Update active screen size and layout to match the new display resolution
+    lv_obj_t *active_screen = lv_screen_active();
+    if (active_screen != nullptr) {
+        int32_t w = lv_display_get_horizontal_resolution(main_display);
+        int32_t h = lv_display_get_vertical_resolution(main_display);
+
+        lv_obj_set_size(active_screen, w, h);
+        lv_obj_update_layout(active_screen);
+        lv_obj_invalidate(active_screen);
     }
 }
 
