@@ -5,18 +5,13 @@ I got the cheap and widely available JC3248W535 hardware, but had a hard time to
 My purpose is to build a smart lightswitch for wled, hence the project name.
 
 > [!WARNING]
-> UPDATE - Switch to ESP-IDF upcomming
->I have switched to the ESP-IDF stack for performance reasons in my latest code version that i will push to this codebase soon. 
+>I have switched to the ESP-IDF stack for performance reasons in the main branch version.
 >
->Why Arduino Failed vs. Native ESP-IDF
->The Arduino framework adds heavy abstraction layers that slow down execution and force graphical data through tight, unoptimized memory bottlenecks, resulting in low FPS and memory crashes (LoadProhibited). Switching to >Native ESP-IDF strips away that overhead, granting direct, high-speed access to the DMA controller and 8MB PSRAM. This unlocks smooth, high-framerate UI performance and absolute point-to-point stability that Arduino >simply couldn't provide.
+>The Arduino framework used in this branch adds abstraction layers that slow down execution and force graphical data through tight, unoptimized memory bottlenecks, resulting in low FPS and even memory crashes (LoadProhibited). Switching to Native ESP-IDF strips away that overhead, granting direct, high-speed access to the DMA controller and PSRAM. This unlocks smooth, high-framerate UI performance and  stability that Arduino simply couldn't provide.
 >
 >Sure you lose some convenience with this switch but performance is loads and loads better! between ~ 24-50 fps vs. ~ 5-22 fps, depending on how graphical complex your screen is..
->I will update this codebase on the short term with the ESP-IDF version and fork this code to its own branch for documentation purposes, or for anyone smarter than me to improve on this.
 >
->Using Eez studio for the screens.
->
->Enclosed in the new code is an Eez project. This tool is easy to learn, and offers a way for easy GUI design that incorporates the LVGL library. Any changes you make must be build in Eez studio, and will be encorporated >in your latest build from PlatformIO.
+This branch will be kept available for those still interested in this code.
 
 ## ✨ What It Does
 
