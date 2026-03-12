@@ -8,14 +8,18 @@ My primary purpose is to build a smart lightswitch for WLED, hence the project n
 
 ## ✨ What It Does
 
+Shows some pretty twinkling and shooting stars on the main screen for testing purpose. 
+On the test screen you can change rotation, backlighting and toggle stats (fps & cpu)
+
 - **Native ESP-IDF Architecture:** Bypasses Arduino framework limitations, offering direct control over precise memory alignment to prevent rendering crashes.
 - **Optimized Rendering Engine:** Custom layout pushes contiguous partial pixel buffers using an intermediate PSRAM full-framebuffer to prevent QSPI screen scrambling, keeping drawing tear-free and stable at maximum 40MHz SPI.
-- **EEZ Studio Integration:** UI is visually designed in EEZ Studio and fully integrated via exported C-code.
+- **EEZ Studio Integration:** UI is visually designed in EEZ Studio and fully integrated via exported C-code with real-time hardware control bridges.
 - **XIP (Execute-In-Place) Images:** Re-mapped to a custom 16MB partition layout (10MB App space) allowing massive full-screen images (PNG/RGB565) to be rendered directly from flash at hardware speeds without SPIFFS buffering overhead.
-- **Live Hardware Control:** On-screen sliders bound instantly to real-world hardware (e.g., hardware PWM backlight dimming).
-- **LVGL Performance Telemetry:** Optimized settings with built-in LVGL 9 support.
+- **Live Hardware Control:** On-screen sliders and dropdowns bound instantly to real-world hardware (e.g., hardware PWM backlight dimming, screen rotation).
+- **LVGL Performance Telemetry:** Optimized settings with built-in LVGL 9 support for good performance.
 - **Hardware Abstraction:** The driver components for the screen and touch are segregated natively within the custom `lib/AXS15231B/` PlatformIO library feature.
-- **20-40 FPS** performance depending on graphical complexity.
+- **CPU-Efficient Animations:** Dedicated animation module with on-demand rendering (pause when off-screen) — no unnecessary processing.
+- **20-50 FPS** performance depending on graphical complexity with proper screen stability across all UI transitions.
 
 ## ⚠️ On your own...
 This code comes as it is. It is a POC and I am certainly no hardware specialist. I am not planning on active monitoring or maintaining the code, but I might...
@@ -56,6 +60,8 @@ The upside? You are free to use it in any way you like ;)
    pio run -j 8
    ```
 
+   Be aware: first time building might take a while.
+
 3. **Upload:**
    ```bash
    pio run --target upload
@@ -88,24 +94,36 @@ This project uses EEZ Studio as the visual UI builder. The `.eez-project` file l
 5. **Bridge Logic**: Implement any UI callbacks in `/src/ui_actions.cpp` to tie EEZ Flow variables to real device hardware.
 
 ## 🧱 Code Structure
-- `/src/main.cpp` - Entry point and setup.
-- `/src/DisplayManager.cpp` - Core framework, LCD QSPI routing, hardware backlight PWM, LVGL driver registration, and partial bound flush optimisations.
-- `/src/ui_actions.cpp` - The bridge intercepting EEZ UI variables/Flow (e.g. `set_var_test_value()`) to trigger real hardware features.
+- `/src/main.cpp` - Entry point, hardware initialization, and main event loop.
+- `/src/DisplayManager.cpp` - Core framework, LCD QSPI routing, hardware backlight PWM, LVGL driver registration, and partial bound flush optimizations.
+- `/src/ui_actions.cpp` - Bridge layer intercepting EEZ Flow variables (e.g., `set_var_test_value()`, `set_var_screen_rotation()`) to trigger real hardware control.
+- `/src/StarAnimations.cpp` - Dedicated animation system for twinkling and shooting stars with screen-aware pause logic.
+- `/include/StarAnimations.h` - Public API for animation module initialization and lifecycle management.
 - `/lib/AXS15231B/` - Clean hardware wrapper for the AXS15231B QSPI driver and I2C touch controller.
-- `/partitions.csv` - Defines the 16MB memory mapping.
-- `/LightSwitchEez/` - Holds your EEZ Studio `.eez-project` file and generated UI code (`ui.c`, `images.c`, etc.). We also keep the `/resources` folder here for original image assets.
-- `/include/lv_conf.h` - LVGL configuration tailored for ESP-IDF.
+- `/partitions.csv` - Defines the 16MB memory mapping with 10MB app partition and 5MB SPIFFS.
+- `/LightSwitchEez/` - EEZ Studio visual project file and auto-generated UI code (`ui.c`, `images.c`, `screens.c`, etc.). Original image assets in `/resources`.
+- `/include/lv_conf.h` - LVGL configuration tailored for ESP-IDF performance.
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 **Build fails or strange LVGL issues:**
 1. Clean the project completely (`pio run -t clean` or delete `.pio/` and `sdkconfig` to force a complete CMake rebuild).
 2. Ensure EEZ Studio generated code cleanly without old artifacts.
+3. Verify that `/include/` directory has access to all header files (particularly after refactoring).
+
+**High CPU usage on screen transitions:**
+- Ensure EEZ-generated `screens.c` dropdown/slider tick functions properly sync state between flow variables and LVGL widgets.
+- Check that rotation/selection values in `ui_actions.cpp` match the expected ranges (indices vs. actual values).
 
 **Display artifacting / Duplicate Screens:**
 - Do not increase the SPI speed beyond `40000000` (40MHz) in `DisplayManager.cpp` -> `gfx->init()`. The default rigid flex cables provided on generic board clones do not have the signal integrity for 80MHz QSPI.
 
 **Black screen:**
 - Check backlight (GPIO 1) wiring / PWM mapping.
+
+**Animations stuttering or eating CPU:**
+- Verify that `StarAnimations_init()` is called in `app_main()` after `ui_init()`.
+- Ensure animations pause correctly when switching away from the main screen (checked via `lv_scr_act() != main_screen`).
+---
 
 Enjoy!
 

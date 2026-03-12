@@ -11,152 +11,9 @@
 #include "DisplayManager.h"
 #include "ui.h"
 #include "screens.h"
+#include "StarAnimations.h"
 
 static const char* TAG = "MAIN";
-
-#define MAX_STARS 3
-#define MAX_SHOOTING_STARS 2
-
-static void set_obj_x_cb(void * var, int32_t v) { lv_obj_set_x((lv_obj_t*)var, v); }
-static void set_obj_y_cb(void * var, int32_t v) { lv_obj_set_y((lv_obj_t*)var, v); }
-
-// Helper to clone a template animimg object
-static lv_obj_t * clone_animimg(lv_obj_t * template_obj) {
-    lv_obj_t * new_obj = lv_animimg_create(lv_obj_get_parent(template_obj));
-    lv_animimg_set_src(new_obj, lv_animimg_get_src(template_obj), lv_animimg_get_src_count(template_obj));
-    lv_obj_set_size(new_obj, lv_obj_get_width(template_obj), lv_obj_get_height(template_obj));
-    lv_animimg_set_duration(new_obj, lv_animimg_get_duration(template_obj));
-    lv_animimg_set_repeat_count(new_obj, lv_animimg_get_repeat_count(template_obj));
-    lv_obj_remove_flag(new_obj, (lv_obj_flag_t)(LV_OBJ_FLAG_ADV_HITTEST|LV_OBJ_FLAG_CLICK_FOCUSABLE|LV_OBJ_FLAG_SCROLLABLE|LV_OBJ_FLAG_SCROLL_CHAIN_HOR|LV_OBJ_FLAG_SNAPPABLE));
-    lv_obj_add_flag(new_obj, LV_OBJ_FLAG_HIDDEN);
-    return new_obj;
-}
-
-// Timer callback for shooting star animation
-static void shooting_star_anim_timer_cb(lv_timer_t * timer) {
-    lv_obj_t * star_obj = (lv_obj_t *)lv_timer_get_user_data(timer);
-    if (!star_obj || !objects.starcontainer) return;
-
-    if (lv_obj_has_flag(star_obj, LV_OBJ_FLAG_HIDDEN)) {
-        // Unhide and init movement parameters
-        lv_coord_t parent_w = lv_obj_get_width(objects.starcontainer);
-        lv_coord_t parent_h = lv_obj_get_height(objects.starcontainer);
-        lv_coord_t star_w = lv_obj_get_width(star_obj);
-        lv_coord_t star_h = lv_obj_get_height(star_obj);
-        
-        lv_coord_t max_x = parent_w - star_w;
-        lv_coord_t max_y = parent_h - star_h;
-        
-        if (max_x <= 0) max_x = 1;
-        if (max_y <= 0) max_y = 1;
-
-        // Pick random start and end points within boundaries
-        int32_t start_x = esp_random() % max_x;
-        int32_t start_y = esp_random() % max_y;
-        int32_t end_x = esp_random() % max_x;
-        int32_t end_y = esp_random() % max_y;
-        
-        // Calculate the trajectory angle to always face the direction of flight
-        double dx = end_x - start_x;
-        double dy = end_y - start_y;
-        double angle_rad = atan2(dy, dx);
-        double angle_deg = angle_rad * 180.0 / 3.14159265;
-        if (angle_deg < 0) angle_deg += 360.0;
-        
-        // Rotate (requires uncompressed RGB565A8 images to avoid CPU stutter)
-        lv_image_set_rotation(star_obj, (int32_t)(angle_deg * 10));
-
-        // Uniform scaling between -30% to +50% (base 256 -> 179 to 384)
-        uint32_t scale = 179 + (esp_random() % 206);
-        lv_image_set_scale(star_obj, scale);
-        
-        // Speed (animation duration) +/- 50% of the normal 600ms. (300ms to 900ms)
-        uint32_t anim_duration = 300 + (esp_random() % 601);
-        lv_animimg_set_duration(star_obj, anim_duration);
-        
-        // Setup linear motion animation for X
-        lv_anim_t a_x;
-        lv_anim_init(&a_x);
-        lv_anim_set_var(&a_x, star_obj);
-        lv_anim_set_duration(&a_x, anim_duration);
-        lv_anim_set_values(&a_x, start_x, end_x);
-        lv_anim_set_exec_cb(&a_x, set_obj_x_cb);
-        lv_anim_start(&a_x);
-        
-        // Setup linear motion animation for Y
-        lv_anim_t a_y;
-        lv_anim_init(&a_y);
-        lv_anim_set_var(&a_y, star_obj);
-        lv_anim_set_duration(&a_y, anim_duration);
-        lv_anim_set_values(&a_y, start_y, end_y);
-        lv_anim_set_exec_cb(&a_y, set_obj_y_cb);
-        lv_anim_start(&a_y);
-        
-        // Restart the sprite animation so it plays from frame 1
-        lv_animimg_start(star_obj);
-        
-        lv_obj_clear_flag(star_obj, LV_OBJ_FLAG_HIDDEN);
-
-        // Keep visible for exactly one animation cycle
-        lv_timer_set_period(timer, anim_duration);
-    } else {
-        // Hide shooting star
-        lv_obj_add_flag(star_obj, LV_OBJ_FLAG_HIDDEN);
-        
-        // Next appearance in 10 to 20 seconds
-        uint32_t next_show = 10000 + (esp_random() % 10001);
-        lv_timer_set_period(timer, next_show);
-    }
-}
-
-// Timer callback for twinkling star animation
-static void star_anim_timer_cb(lv_timer_t * timer) {
-    lv_obj_t * star_obj = (lv_obj_t *)lv_timer_get_user_data(timer);
-    if (!star_obj || !objects.starcontainer) return;
-
-    if (lv_obj_has_flag(star_obj, LV_OBJ_FLAG_HIDDEN)) {
-        // Star is currently hidden, show it at a random position
-        lv_coord_t parent_w = lv_obj_get_width(objects.starcontainer);
-        lv_coord_t parent_h = lv_obj_get_height(objects.starcontainer);
-        lv_coord_t star_w = lv_obj_get_width(star_obj);
-        lv_coord_t star_h = lv_obj_get_height(star_obj);
-        
-        lv_coord_t max_x = parent_w - star_w;
-        lv_coord_t max_y = parent_h - star_h;
-        
-        if (max_x > 0 && max_y > 0) {
-            lv_coord_t rand_x = esp_random() % max_x;
-            lv_coord_t rand_y = esp_random() % max_y;
-            lv_obj_set_pos(star_obj, rand_x, rand_y);
-        }
-        
-        // Random scale +/- 30% (base is 256 for 100%, 30% is 77 -> range 179 to 333)
-        uint32_t scale = 179 + (esp_random() % 154);
-        lv_image_set_scale(star_obj, scale);
-        
-        // Random duration between 500 and 1000 ms
-        uint32_t anim_duration = 500 + (esp_random() % 501);
-        lv_animimg_set_duration(star_obj, anim_duration);
-        
-        // Restart animation so it always starts at frame 1 when shown
-        lv_animimg_start(star_obj);
-        
-        lv_obj_clear_flag(star_obj, LV_OBJ_FLAG_HIDDEN);
-
-        // 80% chance of blinking 1 time, 20% chance of blinking 2 times
-        uint32_t repeat_count = (esp_random() % 100 < 80) ? 1 : 2;
-        
-        // Keep visible for enough time to finish the animation repeat_count times
-        lv_timer_set_period(timer, anim_duration * repeat_count);
-    } else {
-        // Hide star
-        lv_obj_add_flag(star_obj, LV_OBJ_FLAG_HIDDEN);
-        
-        // Next appearance in 1 to 3.5 seconds
-        uint32_t next_show = 1000 + (esp_random() % 2500);
-        lv_timer_set_period(timer, next_show);
-    }
-}
 
 // Main application entry point
 extern "C" void app_main()
@@ -190,25 +47,9 @@ extern "C" void app_main()
 
     ui_init();
 
-    if (objects.star) {
-        lv_obj_add_flag(objects.star, LV_OBJ_FLAG_HIDDEN);
-        lv_timer_create(star_anim_timer_cb, 1000, objects.star);
-        
-        for (int i = 1; i < MAX_STARS; i++) {
-            lv_obj_t * new_star = clone_animimg(objects.star);
-            lv_timer_create(star_anim_timer_cb, 1000 + (esp_random() % 2000), new_star);
-        }
-    }
-
-    if (objects.shooting_star) {
-        lv_obj_add_flag(objects.shooting_star, LV_OBJ_FLAG_HIDDEN);
-        lv_timer_create(shooting_star_anim_timer_cb, 5000 + (esp_random() % 5000), objects.shooting_star);
-        
-        for (int i = 1; i < MAX_SHOOTING_STARS; i++) {
-            lv_obj_t * new_shooting_star = clone_animimg(objects.shooting_star);
-            lv_timer_create(shooting_star_anim_timer_cb, 8000 + (esp_random() % 8000), new_shooting_star);
-        }
-    }
+    // Initialize star animation system
+    StarAnimations_init(objects.starcontainer, objects.star, 
+                       objects.shooting_star, objects.main);
 
     while(true) {
         DisplayManager::process();

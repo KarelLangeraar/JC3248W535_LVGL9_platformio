@@ -13,6 +13,10 @@
 
 namespace {
 
+uint32_t my_tick_get_cb(void) {
+    return (uint32_t)(esp_timer_get_time() / 1000);
+}
+
 AXS15231B_Display *gfx = new AXS15231B_Display(TFT_WIDTH, TFT_HEIGHT);
 AXS15231B_Touch_IDF touch(TOUCH_SCL, TOUCH_SDA, TOUCH_INT, TOUCH_ADDR, 0);
 
@@ -218,6 +222,7 @@ bool begin()
     touch.begin();
 
     lv_init();
+    lv_tick_set_cb(my_tick_get_cb);
 
     main_display = lv_display_create(TFT_WIDTH, TFT_HEIGHT);
     lv_display_set_default(main_display);
@@ -272,15 +277,6 @@ bool begin()
 
 void process()
 {
-    static uint32_t last_tick = 0;
-    uint32_t now = (uint32_t)(esp_timer_get_time() / 1000);
-
-    uint32_t elapsed = now - last_tick;
-    if(elapsed > 0) {
-        lv_tick_inc(elapsed);
-        last_tick = now;
-    }
-
     uint32_t wait_ms = lv_timer_handler();
 
     // FreeRTOS tasks (like LVGL background threads) need idle time to flush.   

@@ -7,7 +7,6 @@
 #include "vars.h"
 #include "styles.h"
 #include "ui.h"
-
 #include <string.h>
 
 objects_t objects;
